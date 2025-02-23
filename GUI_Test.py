@@ -1,12 +1,10 @@
 import tkinter as tk
 from tkinter import messagebox
+from PIL import Image, ImageTk  # Required for PNG handling
 import threading
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
-import subprocess
-import os
-from sensor_msgs.msg import Image
 
 class MultiTopicSubscriber(Node):
 
@@ -38,47 +36,46 @@ class MultiTopicSubscriber(Node):
         self.get_logger().info(f"Subscribed to topic: {topic_name}")
  
 class TkMultiTopicApp:
-
+    
     def __init__(self, root, ros_node):
 
         # Initial root and node
         self.root = root
         self.ros_node = ros_node
 
+        # Set colors
+        self.root.configure(bg="white")
+
         # Frame 
-        self.input_frame = tk.Frame(root)
+        self.input_frame = tk.Frame(root, bg="white")
         self.input_frame.grid(row=0, column=0, padx=10, pady=10, sticky="w")
 
         # Normal topic labels, grid, and buttons
-        self.topic_label = tk.Label(self.input_frame, text="Enter Topic Name:")
+        self.topic_label = tk.Label(self.input_frame, text="Enter Topic Name:", bg="white", fg="red")
         self.topic_label.grid(row=0, column=0, padx=5, pady=5)
 
         self.topic_entry = tk.Entry(self.input_frame, width=30)
         self.topic_entry.grid(row=0, column=1, padx=5, pady=5)
 
         self.subscribe_button = tk.Button(
-
-            self.input_frame, text="Subscribe", command=self.subscribe_to_topic
-
+            self.input_frame, text="Subscribe", command=self.subscribe_to_topic, bg="red", fg="white"
         )
         self.subscribe_button.grid(row=0, column=2, padx=5, pady=5)
 
         # Camera topic labels, grid, and buttons
-        self.camera_label = tk.Label(self.input_frame, text="Enter Camera Name:")
+        self.camera_label = tk.Label(self.input_frame, text="Enter Camera Name:", bg="white", fg="red")
         self.camera_label.grid(row=1, column=0, padx=5, pady=5)
 
         self.camera_entry = tk.Entry(self.input_frame, width=30)
         self.camera_entry.grid(row=1, column=1, padx=5, pady=5)
 
         self.camera_subscribe_button = tk.Button(
-
-            self.input_frame, text="Subscribe", command=self.subscribe_to_camera_topic
-
+            self.input_frame, text="Subscribe", command=self.subscribe_to_camera_topic, bg="red", fg="white"
         )
         self.camera_subscribe_button.grid(row=1, column=2, padx=5, pady=5)
 
         # Frame for messages
-        self.messages_frame = tk.Frame(root, bg="lightgray")
+        self.messages_frame = tk.Frame(root, bg="red")
         self.messages_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
 
         # Configure the root grid layout
@@ -101,8 +98,11 @@ class TkMultiTopicApp:
 
     # Subscription logic 
     def subscribe_to_topic(self):
+
         topic_name = self.topic_entry.get().strip()
+
         if topic_name:
+
             if topic_name in self.messages_widgets:
 
                 messagebox.showinfo("Already Subscribed", f"Already subscribed to {topic_name}.")
@@ -125,6 +125,7 @@ class TkMultiTopicApp:
         camera_topic_name = self.camera_entry.get().strip()
 
         if camera_topic_name:
+
             if camera_topic_name in self.messages_widgets:
 
                 messagebox.showinfo("Already Subscribed", f"Already subscribed to {camera_topic_name}.")
@@ -145,7 +146,6 @@ class TkMultiTopicApp:
 
     # Labeling logic
     def add_topic_label(self, topic_name):
- 
         
         label_frame = tk.Frame(self.messages_frame, bg="white", bd=1, relief="solid")
         label_frame.place(x=10, y=10)  
@@ -207,6 +207,7 @@ class TkMultiTopicApp:
     def remove_topic(self, topic_name):
  
         if topic_name in self.messages_widgets:
+            
             # Cancel the timeout timer if it's running
             if self.messages_widgets[topic_name]["timeout_timer"]:
                 self.messages_widgets[topic_name]["timeout_timer"].cancel()
@@ -286,10 +287,10 @@ class TkMultiTopicApp:
     # Launches rviz
     def launch_rviz(self):
         rviz_cmd = ["ros2", "run", "rviz2", "rviz2"]
-        try:
-            subprocess.Popen(rviz_cmd)
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to launch RViz: {e}")
+        # try:
+            # subprocess.Popen(rviz_cmd)
+        # except Exception as e:
+            # messagebox.showerror("Error", f"Failed to launch RViz: {e}")
 
 def main():
 
@@ -308,3 +309,6 @@ def main():
 
     ros_node.destroy_node()
     rclpy.shutdown()
+
+if __name__ == "__main__":
+    main()
